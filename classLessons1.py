@@ -1,24 +1,30 @@
-class Digital_number():
-    """Число"""
+from loguru import logger
 
-    def __init__(self, num: int, sig: int) -> int:
-        """Конструктор класса"""
-        self.num = num
-        self.sig = sig
+logger.add('debug.json', format='{time} {level} {message}',
+           level="DEBUG", rotation="1 week", compression="zip",
+           serialize=True)
 
-    def sum_digit(self) -> int:
-        """Сумма цифр числа"""
-        summa = 0
-        for i in range(self.sig):
-            summa += self.num // (10 ** i) % 10
-        return summa
 
-    def product_of_numbers(self) -> int:
-        """Произведение цифр числа"""
-        pr = 1
-        for i in range(self.sig):
-            pr *= self.num // (10 ** i) % 10
-        return pr
+@logger.catch
+def generate_permutations(number):
+    num_str = str(number)
+    visited = [False] * len(num_str)
+    result = []
+
+    def backtrack(current):
+        if len(current) == len(num_str):
+            result.append(int(current))
+            return
+
+        for i in range(len(num_str)):
+            if not visited[i]:
+                visited[i] = True
+                backtrack(current + num_str[i])
+                visited[i] = False
+
+    backtrack("")
+
+    return result
 
 
 if __name__ == '__main__':
@@ -28,11 +34,11 @@ if __name__ == '__main__':
             number = int(numb)
             break
         else:
-            print('Некорректный ввод. Введите число.')
+            print('Некорректный ввод. Введите число с различными цифрами.')
 
-    significance = len(str(number))
+    permutations = generate_permutations(number)
 
-    my_number = Digital_number(number, significance)
+    print()
 
-    print(f'Сумма цифр = {my_number.sum_digit()}')
-    print(f'Произведение цифр = {my_number.product_of_numbers()}')
+    for num in permutations:
+        print(num)
